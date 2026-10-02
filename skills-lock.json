@@ -1,53 +1,53 @@
 {
-  "version": 1,
-  "skills": {
-    "frontend-accessibility-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-accessibility-best-practices/SKILL.md",
-      "computedHash": "d9160dfd924c53bb033f4fac882a7cb0c2d2a9cd34e19473a6e4f6d09b0917de"
-    },
-    "frontend-async-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-async-best-practices/SKILL.md",
-      "computedHash": "f8d5da68f7b02d4c62622830166cd43f2e55df68448f40d61ac5fe7eedbcbd05"
-    },
-    "frontend-internationalization-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-internationalization-best-practices/SKILL.md",
-      "computedHash": "808d4c81e6e21570180d90f673b3aa9b5b4f8a3885d268900b3945f39638fc3b"
-    },
-    "frontend-js-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-js-best-practices/SKILL.md",
-      "computedHash": "83150324ae97d350f6eb86cc1f6620441bda91c2d07562e0233b1ad868b07134"
-    },
-    "frontend-react-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-react-best-practices/SKILL.md",
-      "computedHash": "b0a43ebbba8550bfa179283acf9979994bd15245660ee1163204e2f307d971ff"
-    },
-    "frontend-react-router-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-react-router-best-practices/SKILL.md",
-      "computedHash": "dfedb94fcefb0739a281fe8b57935953e24df0df36cc93cb3eeabc9fc668cceb"
-    },
-    "frontend-tailwind-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-tailwind-best-practices/SKILL.md",
-      "computedHash": "a8287f2d78ec0fd7b7f98be9683d32aa37b863759c67eddd411f0dfbcbe06099"
-    },
-    "frontend-testing-best-practices": {
-      "source": "sergiodxa/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/frontend-testing-best-practices/SKILL.md",
-      "computedHash": "b021ecb24de186f86f2d4bd9ce981ba952946c3dec3a6f039819a99d2e178602"
-    }
-  }
+	"version": 1,
+	"skills": {
+		"frontend-accessibility-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-accessibility-best-practices/SKILL.md",
+			"computedHash": "d9160dfd924c53bb033f4fac882a7cb0c2d2a9cd34e19473a6e4f6d09b0917de"
+		},
+		"frontend-async-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-async-best-practices/SKILL.md",
+			"computedHash": "f8d5da68f7b02d4c62622830166cd43f2e55df68448f40d61ac5fe7eedbcbd05"
+		},
+		"frontend-internationalization-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-internationalization-best-practices/SKILL.md",
+			"computedHash": "808d4c81e6e21570180d90f673b3aa9b5b4f8a3885d268900b3945f39638fc3b"
+		},
+		"frontend-js-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-js-best-practices/SKILL.md",
+			"computedHash": "83150324ae97d350f6eb86cc1f6620441bda91c2d07562e0233b1ad868b07134"
+		},
+		"frontend-react-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-react-best-practices/SKILL.md",
+			"computedHash": "b0a43ebbba8550bfa179283acf9979994bd15245660ee1163204e2f307d971ff"
+		},
+		"frontend-react-router-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-react-router-best-practices/SKILL.md",
+			"computedHash": "dfedb94fcefb0739a281fe8b57935953e24df0df36cc93cb3eeabc9fc668cceb"
+		},
+		"frontend-tailwind-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-tailwind-best-practices/SKILL.md",
+			"computedHash": "a8287f2d78ec0fd7b7f98be9683d32aa37b863759c67eddd411f0dfbcbe06099"
+		},
+		"frontend-testing-best-practices": {
+			"source": "sergiodxa/agent-skills",
+			"sourceType": "github",
+			"skillPath": "skills/frontend-testing-best-practices/SKILL.md",
+			"computedHash": "b021ecb24de186f86f2d4bd9ce981ba952946c3dec3a6f039819a99d2e178602"
+		}
+	}
 }

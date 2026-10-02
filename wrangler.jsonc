@@ -6,6 +6,10 @@
 	"vars": {
 		"VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
 	},
+	// Declare binding names for type generation; values stay in local env files or Worker secrets.
+	"secrets": {
+		"required": ["CLERK_SECRET_KEY", "VITE_CLERK_PUBLISHABLE_KEY"]
+	},
 	"observability": { "enabled": true },
 	"upload_source_maps": true,
 	// The default environment is local-only: no remote D1 database ID.
@@ -21,6 +25,9 @@
 		"stg": {
 			"name": "spendtip-app-stg",
 			"vars": { "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare" },
+			"secrets": {
+				"required": ["CLERK_SECRET_KEY", "VITE_CLERK_PUBLISHABLE_KEY"]
+			},
 			"d1_databases": [
 				{
 					"binding": "DB",
@@ -34,6 +41,9 @@
 		"prod": {
 			"name": "spendtip-app-prod",
 			"vars": { "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare" },
+			"secrets": {
+				"required": ["CLERK_SECRET_KEY", "VITE_CLERK_PUBLISHABLE_KEY"]
+			},
 			"d1_databases": [
 				{
 					"binding": "DB",
