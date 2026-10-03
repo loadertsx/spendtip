@@ -1,28 +1,20 @@
-import { Show, useUser } from "@clerk/react-router";
-import { Landing } from "~/features/landing/landing";
-import type { Route } from "./+types/home";
+import { useUser } from "@clerk/react-router";
+import { requireSpendtipUser } from "~/features/auth/session.server";
+import type { Route } from "./+types/me";
 
 export function meta(_: Route.MetaArgs) {
 	return [
-		{ title: "Spendtip" },
+		{ title: "Overview · Spendtip" },
 		{ name: "description", content: "Know exactly where your money goes." },
 	];
 }
 
-export default function Home() {
-	return (
-		<>
-			<Show when="signed-out">
-				<Landing />
-			</Show>
-			<Show when="signed-in">
-				<Overview />
-			</Show>
-		</>
-	);
+export async function loader(args: Route.LoaderArgs) {
+	await requireSpendtipUser(args);
+	return null;
 }
 
-function Overview() {
+export default function Component() {
 	const { user } = useUser();
 	const month = new Date().toLocaleString("en-US", { month: "long" });
 

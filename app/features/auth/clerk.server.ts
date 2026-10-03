@@ -20,8 +20,8 @@ function getClerkOptions(request: Request) {
 		authorizedParties: [new URL(request.url).origin],
 		signInUrl: "/sign-in",
 		signUpUrl: "/sign-up",
-		signInFallbackRedirectUrl: "/account",
-		signUpFallbackRedirectUrl: "/account",
+		signInFallbackRedirectUrl: "/me",
+		signUpFallbackRedirectUrl: "/me",
 	};
 }
 

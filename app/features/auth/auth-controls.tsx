@@ -22,7 +22,7 @@ export function AuthControls() {
 			<ul className="flex items-center gap-1">
 				<Show when="signed-in">
 					<li>
-						<NavLink to="/" end className={navLinkClass}>
+						<NavLink to="/me" end className={navLinkClass}>
 							Home
 						</NavLink>
 					</li>

@@ -1,5 +1,6 @@
-import { SignUpButton } from "@clerk/react-router";
+import { Show, SignUpButton } from "@clerk/react-router";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 export function Landing() {
 	return (
@@ -50,12 +51,19 @@ export function Landing() {
 function SignUpCta() {
 	return (
 		<div className="mt-10 flex flex-col items-center gap-3">
-			<SignUpButton>
-				<button type="button" className="btn-primary px-7 py-3.5 text-lg">
-					Start your ledger — it's free
-				</button>
-			</SignUpButton>
-			<p className="text-sm text-muted">No credit card. Takes 30 seconds.</p>
+			<Show when="signed-in">
+				<Link to="/me" className="btn-primary px-7 py-3.5 text-lg">
+					Enter your ledger
+				</Link>
+			</Show>
+			<Show when="signed-out">
+				<SignUpButton>
+					<button type="button" className="btn-primary px-7 py-3.5 text-lg">
+						Start your ledger — it's free
+					</button>
+				</SignUpButton>
+				<p className="text-sm text-muted">No credit card. Takes 30 seconds.</p>
+			</Show>
 		</div>
 	);
 }
