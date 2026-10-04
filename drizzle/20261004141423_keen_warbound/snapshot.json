@@ -1,0 +1,337 @@
+{
+	"version": "7",
+	"dialect": "sqlite",
+	"id": "a7b202e8-a00e-445e-8de4-04da8aacedc0",
+	"prevIds": ["95bbf43d-d626-4008-b988-ab390f98e556"],
+	"ddl": [
+		{
+			"name": "categories",
+			"entityType": "tables"
+		},
+		{
+			"name": "expenses",
+			"entityType": "tables"
+		},
+		{
+			"name": "users",
+			"entityType": "tables"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "categories"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "user_id",
+			"entityType": "columns",
+			"table": "categories"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "name",
+			"entityType": "columns",
+			"table": "categories"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "description",
+			"entityType": "columns",
+			"table": "categories"
+		},
+		{
+			"type": "integer",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "archived_at",
+			"entityType": "columns",
+			"table": "categories"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "user_id",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "category_id",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "original_text",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "amount_minor",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "currency",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "occurred_at",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "created_at",
+			"entityType": "columns",
+			"table": "expenses"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "clerk_user_id",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "email",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "name",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "avatar_url",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "created_at",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "updated_at",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"columns": ["user_id"],
+			"tableTo": "users",
+			"columnsTo": ["id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "RESTRICT",
+			"nameExplicit": false,
+			"name": "fk_categories_user_id_users_id_fk",
+			"entityType": "fks",
+			"table": "categories"
+		},
+		{
+			"columns": ["user_id"],
+			"tableTo": "users",
+			"columnsTo": ["id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "RESTRICT",
+			"nameExplicit": false,
+			"name": "fk_expenses_user_id_users_id_fk",
+			"entityType": "fks",
+			"table": "expenses"
+		},
+		{
+			"columns": ["user_id", "category_id"],
+			"tableTo": "categories",
+			"columnsTo": ["user_id", "id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "RESTRICT",
+			"nameExplicit": true,
+			"name": "expenses_user_category_fk",
+			"entityType": "fks",
+			"table": "expenses"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "categories_pk",
+			"entityType": "pks",
+			"table": "categories"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "expenses_pk",
+			"entityType": "pks",
+			"table": "expenses"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "users_pk",
+			"entityType": "pks",
+			"table": "users"
+		},
+		{
+			"columns": [
+				{
+					"value": "user_id",
+					"isExpression": false
+				},
+				{
+					"value": "archived_at",
+					"isExpression": false
+				}
+			],
+			"isUnique": false,
+			"where": null,
+			"origin": "manual",
+			"name": "categories_user_archived_at_idx",
+			"entityType": "indexes",
+			"table": "categories"
+		},
+		{
+			"columns": [
+				{
+					"value": "user_id",
+					"isExpression": false
+				},
+				{
+					"value": "occurred_at",
+					"isExpression": false
+				}
+			],
+			"isUnique": false,
+			"where": null,
+			"origin": "manual",
+			"name": "expenses_user_occurred_at_idx",
+			"entityType": "indexes",
+			"table": "expenses"
+		},
+		{
+			"columns": ["user_id", "id"],
+			"nameExplicit": true,
+			"name": "categories_user_id_id_unique",
+			"entityType": "uniques",
+			"table": "categories"
+		},
+		{
+			"columns": ["clerk_user_id"],
+			"nameExplicit": false,
+			"name": "users_clerk_user_id_unique",
+			"entityType": "uniques",
+			"table": "users"
+		},
+		{
+			"value": "typeof(\"amount_minor\") = 'integer' AND \"amount_minor\" > 0 AND \"amount_minor\" <= 9007199254740991",
+			"name": "expenses_amount_minor_check",
+			"entityType": "checks",
+			"table": "expenses"
+		},
+		{
+			"value": "\"currency\" GLOB '[A-Z][A-Z][A-Z]'",
+			"name": "expenses_currency_check",
+			"entityType": "checks",
+			"table": "expenses"
+		}
+	],
+	"renames": []
+}

@@ -27,6 +27,7 @@ app/
       ...                # feature logic and UI
   shared/db/
     client.server.ts     # getDb(), uses the current Worker's DB binding
+    relations.ts         # pure Drizzle relational-query metadata
 
 drizzle/                 # version-controlled SQL history and snapshots
 ```
@@ -50,6 +51,92 @@ export function listExpenses() {
 `getDb()` can only be used inside the Worker. It does not select environments or
 use tokens: Cloudflare provides the corresponding `DB` binding. `.server.ts`
 prevents accidental imports into browser code.
+
+## Categories and expenses
+
+```text
+users       1 ─── N categories
+users       1 ─── N expenses
+categories  1 ─── N expenses (same owner)
+
+app/features/categories/  # user-owned category schema
+app/features/expenses/    # expense schema and SQLite persistence tests
+app/shared/db/relations.ts # Drizzle query metadata for all three tables
+```
+
+Every category belongs to a Spendtip user. New users start with no categories;
+there is no shared catalog, predefined category, stable translation code, or
+category translation file. Names and descriptions are stored exactly as authored,
+in any language. The description provides guidance for future AI classification.
+
+| Category column | Contract |
+| --- | --- |
+| `id` | Text UUID primary key |
+| `user_id` | Required foreign key to the internal `users.id` |
+| `name` | Required user-authored name |
+| `description` | Required user-authored classification guidance |
+| `archived_at` | Nullable UTC timestamp in integer milliseconds |
+
+An index on `(user_id, archived_at)` supports active-category queries.
+Archiving sets `archived_at` without deleting the category or its historical
+expenses. Future creation handlers should only offer the user's active categories;
+the foreign key itself does not prohibit assigning an archived category.
+
+`expenses` belongs to a Spendtip user:
+
+| Column | Contract |
+| --- | --- |
+| `id` | Text UUID primary key |
+| `user_id` | Required foreign key to the internal `users.id` |
+| `category_id` | Nullable; references a category with the same `user_id` |
+| `original_text` | Required, preserves the user's original input |
+| `amount_minor` | Required positive integer, at most `Number.MAX_SAFE_INTEGER` |
+| `currency` | Required three uppercase letters, e.g. `ARS`, `USD`, `EUR` |
+| `occurred_at` | Required UTC timestamp in integer milliseconds |
+| `created_at` | Required UTC timestamp in integer milliseconds |
+
+The composite foreign key `expenses(user_id, category_id)` references
+`categories(user_id, id)`. It rejects another user's category on both inserts
+and updates. A unique key on the parent columns supports this constraint.
+Foreign keys also prevent orphaned data and deletion of referenced users/categories.
+A null category means pending classification; there is no special Other category.
+An index on `(user_id, occurred_at)` supports history queries.
+
+Amounts use the currency's smallest unit (e.g. `1050` means USD 10.50).
+The currency constraint validates the code's shape, not membership in an ISO
+currency list. Zero, negative, fractional, and unsafe integer amounts are rejected.
+Drizzle generates UUIDs and expense `created_at` at insertion; raw SQL inserts
+must supply them. Drizzle exposes timestamps as `Date` values.
+
+`getDb()` registers the pure `defineRelations` metadata in `relations.ts`.
+This supports `db.query` and nested `with` queries; it does not create SQL
+constraints or automatically scope root queries to the signed-in user.
+
+```ts
+// In an authenticated server handler, after resolving currentUser:
+const records = await getDb().query.expenses.findMany({
+  where: { userId: currentUser.id },
+  with: { category: true }, // null for pending classification
+});
+```
+
+**Development reset:** `20261004141423_keen_warbound/migration.sql` discards
+all existing categories and expenses, preserving every user field unchanged.
+It replaces the earlier shared-catalog design before staging/production use.
+The old seed SQL remains only in migration history; applying the complete history
+leaves categories and expenses empty. Do not apply this reset to any database
+whose category/expense data must be preserved.
+
+Apply the reviewed migration locally and inspect the tables with:
+
+```sh
+bun run db:migrate:local
+bun run db:studio:local
+```
+
+This is the persistence foundation only: no category/expense endpoints, forms,
+or AI classification are implemented. Future handlers must enforce ownership
+using the authenticated Spendtip user, including category editing and archiving.
 
 ## Authentication: Clerk + Spendtip users
 
@@ -230,7 +317,7 @@ precedence over `.env`. Do not commit tokens or prefix them with `VITE_`.
 ## Build, deployment, and checks
 
 ```sh
-bun run test               # pure initial-profile mapping tests
+bun run test               # profile mapping, ownership, relational queries, and SQLite migrations
 bun run check:types        # delegates to the complete typecheck pipeline
 npx -y clerk@latest doctor
 bun run build              # local build
