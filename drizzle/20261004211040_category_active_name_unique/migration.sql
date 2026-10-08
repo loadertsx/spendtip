@@ -1,0 +1,2 @@
+ALTER TABLE `categories` ADD `name_key` text NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX `categories_user_active_name_unique` ON `categories` (`user_id`,`name_key`) WHERE "categories"."archived_at" IS NULL;

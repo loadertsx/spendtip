@@ -5,6 +5,7 @@ import { type Client, createClient } from "@libsql/client";
 import { and, eq, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import { relations } from "../../shared/db/relations";
+import { categoryNameFields } from "../categories/category-name";
 import { categories } from "../categories/schema";
 import { users } from "../users/schema";
 import { expenses } from "./schema";
@@ -22,6 +23,16 @@ const userId = "test-user";
 const otherUserId = "other-user";
 const occurredAt = new Date("2026-10-01T12:00:00.000Z");
 const uuidPattern = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i;
+
+function isUniqueNameViolation(error: unknown): boolean {
+	return (
+		error instanceof Error &&
+		error.cause instanceof Error &&
+		/UNIQUE constraint failed: categories.user_id, categories.name_key/.test(
+			error.cause.message,
+		)
+	);
+}
 
 describe("user-owned categories and expense persistence", () => {
 	let client: Client;
@@ -44,12 +55,12 @@ describe("user-owned categories and expense persistence", () => {
 		client.close();
 	});
 
-	async function createCategory(ownerId = userId) {
+	async function createCategory(ownerId = userId, name = "Café con amigos") {
 		const [category] = await db
 			.insert(categories)
 			.values({
 				userId: ownerId,
-				name: "Café con amigos",
+				...categoryNameFields(name),
 				description: "Coffee and snacks shared with friends.",
 			})
 			.returning();
@@ -95,7 +106,15 @@ describe("user-owned categories and expense persistence", () => {
 		const columns = await client.execute("PRAGMA table_info('categories')");
 		assert.deepEqual(
 			columns.rows.map((row) => row.name),
-			["id", "user_id", "name", "description", "archived_at"],
+			[
+				"id",
+				"user_id",
+				"name",
+				"description",
+				"archived_at",
+				"name_key",
+				"emoji",
+			],
 		);
 	});
 
@@ -109,17 +128,19 @@ describe("user-owned categories and expense persistence", () => {
 			"Coffee and snacks shared with friends.",
 		);
 		assert.equal(category.archivedAt, null);
+		assert.equal(category.emoji, "🛒");
 	});
 
 	it("requires category metadata and an existing owner", async () => {
-		for (const column of ["user_id", "name", "description"]) {
+		for (const column of ["user_id", "name", "name_key", "description"]) {
 			await assert.rejects(
 				client.execute({
-					sql: "INSERT INTO categories (id, user_id, name, description) VALUES (?, ?, ?, ?)",
+					sql: "INSERT INTO categories (id, user_id, name, name_key, description) VALUES (?, ?, ?, ?, ?)",
 					args: [
 						crypto.randomUUID(),
 						column === "user_id" ? null : userId,
 						column === "name" ? null : "Personal",
+						column === "name_key" ? null : "personal",
 						column === "description" ? null : "Personal expenses",
 					],
 				}),
@@ -128,7 +149,7 @@ describe("user-owned categories and expense persistence", () => {
 		}
 		await assert.rejects(
 			client.execute(
-				"INSERT INTO categories (id, user_id, name, description) VALUES ('missing', 'missing-user', 'Personal', 'Personal expenses')",
+				"INSERT INTO categories (id, user_id, name, name_key, description) VALUES ('missing', 'missing-user', 'Personal', 'personal', 'Personal expenses')",
 			),
 			/FOREIGN KEY constraint/,
 		);
@@ -143,6 +164,67 @@ describe("user-owned categories and expense persistence", () => {
 			await db.select().from(categories).where(eq(categories.userId, userId)),
 			[first],
 		);
+	});
+
+	it("rejects duplicate active names including Unicode case and encoding variants", async () => {
+		for (const variants of [
+			["CAFÉ", " café ", "CAFE\u0301"],
+			["NIÑO", " niño ", "NIN\u0303O"],
+		]) {
+			await createCategory(userId, variants[0]);
+			for (const name of variants.slice(1)) {
+				await assert.rejects(
+					createCategory(userId, name),
+					isUniqueNameViolation,
+				);
+			}
+			await createCategory(otherUserId, variants[0]);
+		}
+		await createCategory(userId, "cafe");
+		await createCategory(userId, "nino");
+	});
+
+	it("rejects renaming an active category to another active name", async () => {
+		await createCategory(userId, "CAFÉ");
+		const other = await createCategory(userId, "Transport");
+		await assert.rejects(
+			db
+				.update(categories)
+				.set(categoryNameFields(" café "))
+				.where(eq(categories.id, other.id)),
+			isUniqueNameViolation,
+		);
+		const [stored] = await db
+			.select()
+			.from(categories)
+			.where(eq(categories.id, other.id));
+		assert.equal(stored.name, "Transport");
+		assert.equal(stored.nameKey, "transport");
+	});
+
+	it("allows archived-name reuse but rejects conflicting restoration", async () => {
+		const old = await createCategory(userId, "NIÑO");
+		await db
+			.update(categories)
+			.set({ archivedAt: new Date() })
+			.where(eq(categories.id, old.id));
+		const replacement = await createCategory(userId, "niño");
+		await assert.rejects(
+			db
+				.update(categories)
+				.set({ archivedAt: null })
+				.where(eq(categories.id, old.id)),
+			isUniqueNameViolation,
+		);
+		await db
+			.update(categories)
+			.set({ archivedAt: new Date() })
+			.where(eq(categories.id, replacement.id));
+		await db
+			.update(categories)
+			.set({ archivedAt: null })
+			.where(eq(categories.id, old.id));
+		await assert.rejects(createCategory(userId, "niño"), isUniqueNameViolation);
 	});
 
 	it("stores unclassified expenses and applies Drizzle UUID and timestamp defaults", async () => {
@@ -184,7 +266,7 @@ describe("user-owned categories and expense persistence", () => {
 
 	it("rejects ownership mismatches when updating existing records", async () => {
 		const own = await createCategory();
-		const foreign = await createCategory(otherUserId);
+		const foreign = await createCategory(otherUserId, "Transport");
 		await insertExpense({ categoryId: own.id });
 		for (const statement of [
 			{ sql: "UPDATE expenses SET category_id = ?", args: [foreign.id] },
@@ -200,7 +282,7 @@ describe("user-owned categories and expense persistence", () => {
 
 	it("archives categories without losing expenses and excludes them from active lists", async () => {
 		const archived = await createCategory();
-		const active = await createCategory();
+		const active = await createCategory(userId, "Transport");
 		await createCategory(otherUserId);
 		await insertExpense({ categoryId: archived.id });
 		const before = await db.select().from(expenses);

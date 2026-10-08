@@ -17,13 +17,19 @@ export function AuthControls() {
 	return (
 		<nav
 			aria-label="Account navigation"
-			className="mx-auto grid h-16 max-w-5xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4"
+			className="mx-auto grid max-w-5xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-3 sm:h-16 sm:grid-cols-[1fr_auto_1fr] sm:py-0"
 		>
-			<ul className="flex items-center gap-1">
+			{/* On phones the links get their own row under the logo and controls. */}
+			<ul className="col-span-2 row-start-2 flex items-center justify-center gap-1 empty:hidden sm:col-span-1 sm:row-start-1 sm:flex sm:justify-start">
 				<Show when="signed-in">
 					<li>
 						<NavLink to="/me" end className={navLinkClass}>
 							Home
+						</NavLink>
+					</li>
+					<li>
+						<NavLink to="/categories" className={navLinkClass}>
+							Categories
 						</NavLink>
 					</li>
 					<li>
@@ -33,10 +39,13 @@ export function AuthControls() {
 					</li>
 				</Show>
 			</ul>
-			<Link to="/" className="text-xl font-black tracking-tight">
+			<Link
+				to="/"
+				className="row-start-1 text-xl font-black tracking-tight sm:col-start-2"
+			>
 				spendtip<span className="text-cat-orange">.</span>
 			</Link>
-			<ul className="flex items-center justify-end gap-2">
+			<ul className="row-start-1 flex items-center justify-end gap-2 sm:col-start-3">
 				<li>
 					<ThemeToggle />
 				</li>

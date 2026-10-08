@@ -3,6 +3,9 @@
 React Router + Cloudflare Workers + D1, with Drizzle ORM and Drizzle Studio.
 Use Bun and Node.js >= 22.22 (required by React Router).
 
+Read [CODING_STANDARDS.md](CODING_STANDARDS.md) before changing code and
+[docs/design-guide.md](docs/design-guide.md) before building or changing UI.
+
 ## Local development
 
 ```sh
@@ -74,10 +77,19 @@ in any language. The description provides guidance for future AI classification.
 | `id` | Text UUID primary key |
 | `user_id` | Required foreign key to the internal `users.id` |
 | `name` | Required user-authored name |
+| `name_key` | Required Unicode-normalized name for uniqueness |
 | `description` | Required user-authored classification guidance |
 | `archived_at` | Nullable UTC timestamp in integer milliseconds |
 
 An index on `(user_id, archived_at)` supports active-category queries.
+A unique partial index on `(user_id, name_key)` prevents duplicate active names.
+For inserts and renames, use `categoryNameFields(name)` from
+`app/features/categories/category-name.ts` to write the name and key together.
+The shared normalization trims outer whitespace, applies Unicode NFC and
+locale-independent lowercase, then NFC again. `CAFÉ` / `café` and `NIÑO` / `niño`
+are equivalent; accents remain significant. SQLite cannot derive this Unicode
+key: direct SQL writes must also supply the correctly normalized `name_key`.
+Archived names may be reused; restoring a conflicting category is rejected.
 Archiving sets `archived_at` without deleting the category or its historical
 expenses. Future creation handlers should only offer the user's active categories;
 the foreign key itself does not prohibit assigning an archived category.
@@ -134,9 +146,10 @@ bun run db:migrate:local
 bun run db:studio:local
 ```
 
-This is the persistence foundation only: no category/expense endpoints, forms,
-or AI classification are implemented. Future handlers must enforce ownership
-using the authenticated Spendtip user, including category editing and archiving.
+The `/categories` page supports listing, creating, editing, archiving, and
+restoring the authenticated user's categories. Expense entry and AI
+classification are not implemented. All handlers must enforce ownership using
+the authenticated Spendtip user.
 
 ## Authentication: Clerk + Spendtip users
 
@@ -190,8 +203,9 @@ Routes:
 - `/sign-in/*` and `/sign-up/*`: Clerk's path-routed components.
 - `/account`: protected page displaying the profile persisted in D1.
 
-New pages and navigation do not add CSS, inline styles, or styling classes.
-Clerk components retain their built-in appearance.
+New pages and navigation follow [docs/design-guide.md](docs/design-guide.md),
+using shared tokens and utilities. Clerk components are themed through their
+`appearance` configuration in `app/root.tsx`.
 
 ### Development keys and Worker bindings
 
@@ -258,6 +272,11 @@ bun run db:migrate:local
 The installed version of Drizzle Kit generates a directory per migration;
 Wrangler discovers them through `migrations_pattern: "drizzle/**/migration.sql"`.
 Do not modify migrations that have already been applied; generate a new one.
+
+`20261004211040_category_active_name_unique` adds the required `name_key` and
+active-name unique index. This migration targets the currently empty databases;
+if categories already exist, stop and plan a Unicode backfill before applying it.
+No backfill scripts or changes to the migration commands are needed for empty databases.
 
 The first migration creates the `users` table. Apply it locally before signing
 in; a verified Clerk identity needs a persisted Spendtip user before accessing
